@@ -4,6 +4,16 @@
 
 ---
 
+## 🔐 安全聲明
+
+本專案採用業界標準的**機密分離原則 (Separation of Secrets)**：
+
+- 凡是包含 API Token、密碼等機密的設定檔（如 `alertmanager.yml`），**一律不納入版本控制**，僅以範本檔 (`*.example`) 形式提供。
+- 使用者需自行依範本建立本機設定檔並填入個人憑證，確保即使 repo 公開，敏感資訊也不會外洩。
+- 詳見 `.gitignore` 與第 8 章 Telegram 告警設定。
+
+---
+
 ## 目錄
 
 1. [系統介紹](#1-系統介紹)
@@ -195,7 +205,7 @@ alertmanager    Up        0.0.0.0:9093->9093/tcp
 
 ---
 
-## 8. 設定 Telegram 自動告警
+## 8. 設定 Telegram 自動警告
 
 ### 8-1. 建立 Telegram Bot
 
