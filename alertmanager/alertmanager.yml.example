@@ -1,0 +1,29 @@
+## 使用方式：
+## 1. 把這個檔案複製一份，改名為 alertmanager.yml
+## 2. 把 YOUR_BOT_TOKEN_HERE 換成你自己的 Telegram Bot Token
+## 3. 把 chat_id 的 0 換成你的 Telegram Chat ID
+## 4. 跑 docker-compose restart alertmanager 套用設定
+
+global:
+  resolve_timeout: 1m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 5m
+  receiver: 'telegram-notify'
+
+receivers:
+  - name: 'telegram-notify'
+    telegram_configs:
+      - bot_token: 'YOUR_BOT_TOKEN_HERE'
+        chat_id: 0
+        api_url: 'https://api.telegram.org'
+        parse_mode: 'HTML'
+        message: |
+          <b>{{ .CommonAnnotations.summary }}</b>
+          {{ range .Alerts }}
+          • {{ .Annotations.description }}
+          • 時間：{{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          {{ end }}

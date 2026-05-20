@@ -1,0 +1,38 @@
+groups:
+  - name: server_alerts
+    rules:
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 80
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "警告！生產環境伺服器 CPU 負載過高"
+          description: "{{ $labels.instance }} CPU 使用率已達 {{ $value | printf \"%.1f\" }}%，請資管人員盡速處理！"
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "警告！記憶體使用率過高"
+          description: "{{ $labels.instance }} 記憶體使用率達 {{ $value | printf \"%.1f\" }}%"
+
+      - alert: LowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 85
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "警告！磁碟空間不足"
+          description: "{{ $labels.instance }} 根目錄使用率達 {{ $value | printf \"%.1f\" }}%"
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "嚴重！伺服器無法連線"
+          description: "{{ $labels.instance }} 已離線超過 30 秒"
