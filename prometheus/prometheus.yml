@@ -25,3 +25,7 @@ scrape_configs:
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
+
+  - job_name: 'snake-backend'
+    static_configs:
+      - targets: ['snake-backend:5000']

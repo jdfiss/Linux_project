@@ -28,9 +28,11 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     networks:
       - monitoring
     depends_on:
@@ -72,6 +74,33 @@ services:
     devices:
       - /dev/kmsg
 
+  snake:
+    image: nginx:alpine
+    container_name: snake
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    volumes:
+      - ./snake:/usr/share/nginx/html:ro
+    networks:
+      - monitoring
+    depends_on:
+      - snake-backend
+
+  snake-backend:
+    build: ./backend
+    container_name: snake-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - snake_data:/data
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    networks:
+      - monitoring
+
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
@@ -86,6 +115,7 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  snake_data:
 
 networks:
   monitoring:
